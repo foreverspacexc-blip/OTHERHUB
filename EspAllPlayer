@@ -1,0 +1,99 @@
+-- [[ ULTRA SAFE RED ESP ]] --
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local espEnabled = false
+local ESP_COLOR = Color3.fromRGB(255, 0, 0)
+
+-- ลบ UI เก่าออกถ้ามีอยู่
+if LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("SafeESP_Gui") then
+    LocalPlayer.PlayerGui.SafeESP_Gui:Destroy()
+end
+
+-- สร้าง GUI แบบคลีนที่สุด
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "SafeESP_Gui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Parent = ScreenGui
+ToggleButton.Size = UDim2.new(0, 55, 0, 55)
+ToggleButton.Position = UDim2.new(0.1, 0, 0.4, 0)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ToggleButton.Text = "OFF"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.Font = Enum.Font.SourceSansBold
+ToggleButton.TextSize = 16
+ToggleButton.BorderSizePixel = 0
+ToggleButton.Active = true
+ToggleButton.Draggable = true -- ใช้ระบบลากมาตรฐาน
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(1, 0)
+UICorner.Parent = ToggleButton
+
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Thickness = 1
+UIStroke.Color = ESP_COLOR
+UIStroke.Parent = ToggleButton
+
+local function cleanESP(character)
+    if character and character:FindFirstChild("RedESP") then
+        character.RedESP:Destroy()
+    end
+end
+
+local function applyESP(player)
+    if player == LocalPlayer then return end
+    
+    local function onCharacter(character)
+        if not character then return end
+        pcall(function() cleanESP(character) end)
+        
+        if espEnabled then
+            pcall(function()
+                local highlight = Instance.new("Highlight")
+                highlight.Name = "RedESP"
+                highlight.FillColor = ESP_COLOR
+                highlight.FillTransparency = 0.5
+                highlight.OutlineColor = ESP_COLOR
+                highlight.OutlineTransparency = 0
+                highlight.Adornee = character
+                highlight.Parent = character
+            end)
+        end
+    end
+    
+    onCharacter(player.Character)
+    player.CharacterAdded:Connect(onCharacter)
+end
+
+local function toggleESP()
+    for _, player in ipairs(Players:GetPlayers()) do
+        if espEnabled then
+            applyESP(player)
+        else
+            if player.Character then pcall(function() cleanESP(player.Character) end) end
+        end
+    end
+end
+
+Players.PlayerAdded:Connect(applyESP)
+
+ToggleButton.MouseButton1Click:Connect(function()
+    espEnabled = not espEnabled
+    
+    if espEnabled then
+        ToggleButton.Text = "ON"
+        ToggleButton.BackgroundColor3 = ESP_COLOR
+        UIStroke.Color = Color3.fromRGB(255, 255, 255)
+    else
+        ToggleButton.Text = "OFF"
+        ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        UIStroke.Color = ESP_COLOR
+    end
+    
+    toggleESP()
+end)
