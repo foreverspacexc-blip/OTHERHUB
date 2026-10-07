@@ -1,0 +1,1731 @@
+--==================================================
+-- NEXORA HUB GUI - FIXED LOGO DRAG EDITION
+--==================================================
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local MarketplaceService = game:GetService("MarketplaceService")
+local TweenService = game:GetService("TweenService")
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+local Lighting = game:GetService("Lighting")
+local InsertService = game:GetService("InsertService")
+
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
+
+local old = PlayerGui:FindFirstChild("NEXORA_GUI")
+if old then
+	old:Destroy()
+end
+
+local RED = Color3.fromRGB(255, 25, 45)
+local DARK = Color3.fromRGB(8, 9, 13)
+local PANEL = Color3.fromRGB(14, 16, 22)
+local PANEL2 = Color3.fromRGB(21, 23, 31)
+local WHITE = Color3.fromRGB(245, 245, 248)
+local GRAY = Color3.fromRGB(145, 148, 160)
+local DARKGRAY = Color3.fromRGB(45, 48, 58)
+local GREEN = Color3.fromRGB(40, 220, 130)
+
+local function Corner(obj, radius)
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0, radius or 10)
+	c.Parent = obj
+end
+
+local function Stroke(obj, color, thickness)
+	local s = Instance.new("UIStroke")
+	s.Color = color or RED
+	s.Thickness = thickness or 1
+	s.Parent = obj
+end
+
+local function Label(parent, text, size, pos, textSize, color, font)
+	local l = Instance.new("TextLabel")
+	l.BackgroundTransparency = 1
+	l.Text = text
+	l.Size = size
+	l.Position = pos
+	l.TextColor3 = color or WHITE
+	l.TextSize = textSize or 14
+	l.Font = font or Enum.Font.Gotham
+	l.TextXAlignment = Enum.TextXAlignment.Left
+	l.TextYAlignment = Enum.TextYAlignment.Center
+	l.Parent = parent
+	return l
+end
+
+local Gui = Instance.new("ScreenGui")
+Gui.Name = "NEXORA_GUI"
+Gui.ResetOnSpawn = false
+Gui.IgnoreGuiInset = true
+Gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+Gui.Parent = PlayerGui
+
+local Main = Instance.new("Frame")
+Main.Name = "Main"
+Main.Size = UDim2.new(0, 680, 0, 490)
+Main.AnchorPoint = Vector2.new(0.5, 0.5)
+Main.Position = UDim2.new(0.5, 0, 0.5, 0)
+Main.BackgroundColor3 = DARK
+Main.Parent = Gui
+
+Corner(Main, 15)
+Stroke(Main, RED, 2)
+
+local UIScale = Instance.new("UIScale")
+UIScale.Scale = 0.9
+UIScale.Parent = Main
+
+local function UpdateScale()
+	local camera = workspace.CurrentCamera
+	if not camera then
+		return
+	end
+
+	local viewport = camera.ViewportSize
+
+	if viewport.X < 750 then
+		UIScale.Scale = math.clamp(
+			math.min(viewport.X / 720, viewport.Y / 470),
+			0.68,
+			0.9
+		)
+	else
+		UIScale.Scale = 0.9
+	end
+end
+
+UpdateScale()
+
+local Top = Instance.new("Frame")
+Top.Size = UDim2.new(1, 0, 0, 75)
+Top.BackgroundTransparency = 1
+Top.Parent = Main
+
+local NexoraTitle = Label(
+	Top, "NEXORA",
+	UDim2.new(0, 250, 0, 38),
+	UDim2.new(0, 22, 0, 2),
+	30, RED, Enum.Font.GothamBlack
+)
+
+local NexoraGradient = Instance.new("UIGradient")
+NexoraGradient.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 15, 35)),
+	ColorSequenceKeypoint.new(0.40, Color3.fromRGB(255, 45, 60)),
+	ColorSequenceKeypoint.new(0.65, Color3.fromRGB(255, 150, 155)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
+})
+NexoraGradient.Rotation = 0
+NexoraGradient.Parent = NexoraTitle
+
+local HubTitle = Label(
+	Top, "HUB",
+	UDim2.new(0, 100, 0, 20),
+	UDim2.new(0, 24, 0, 39),
+	13, WHITE, Enum.Font.GothamBold
+)
+
+local HubGradient = Instance.new("UIGradient")
+HubGradient.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+	ColorSequenceKeypoint.new(0.45, Color3.fromRGB(255, 220, 222)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 25, 45))
+})
+HubGradient.Rotation = 0
+HubGradient.Parent = HubTitle
+
+local Min = Instance.new("TextButton")
+Min.Size = UDim2.new(0, 40, 0, 34)
+Min.Position = UDim2.new(1, -87, 0, 10)
+Min.BackgroundColor3 = PANEL2
+Min.Text = "—"
+Min.TextColor3 = WHITE
+Min.TextSize = 19
+Min.Font = Enum.Font.GothamBold
+Min.AutoButtonColor = false
+Min.Parent = Main
+Corner(Min, 8)
+
+local Close = Instance.new("TextButton")
+Close.Size = UDim2.new(0, 40, 0, 34)
+Close.Position = UDim2.new(1, -43, 0, 10)
+Close.BackgroundColor3 = PANEL2
+Close.Text = "×"
+Close.TextColor3 = WHITE
+Close.TextSize = 22
+Close.Font = Enum.Font.GothamBold
+Close.AutoButtonColor = false
+Close.Parent = Main
+Corner(Close, 8)
+
+local Sidebar = Instance.new("Frame")
+Sidebar.Size = UDim2.new(0, 155, 0, 340)
+Sidebar.Position = UDim2.new(0, 15, 0, 85)
+Sidebar.BackgroundTransparency = 1
+Sidebar.Parent = Main
+
+local MenuList = Instance.new("UIListLayout")
+MenuList.Padding = UDim.new(0, 6)
+MenuList.SortOrder = Enum.SortOrder.LayoutOrder
+MenuList.Parent = Sidebar
+
+local MenuData = {
+	{1, "⌂", "หน้าหลัก"},
+	{2, "◉", "ดวงตาเทพ"},
+	{3, "⚒", "เครื่องมือ"},
+	{4, "🚀", "เกรียน"},
+	{5, "⚙", "ตั้งค่า"},
+	{6, "⚡", "พลัง"}
+}
+
+local Content = Instance.new("Frame")
+Content.Size = UDim2.new(1, -185, 0, 340)
+Content.Position = UDim2.new(0, 180, 0, 85)
+Content.BackgroundTransparency = 1
+Content.ClipsDescendants = true
+Content.Parent = Main
+
+local Pages = {}
+local MenuButtons = {}
+
+local function NewPage(name)
+	local page = Instance.new("Frame")
+	page.Name = name
+	page.Size = UDim2.new(1, 0, 1, 0)
+	page.BackgroundTransparency = 1
+	page.Visible = false
+	page.Parent = Content
+	Pages[name] = page
+	return page
+end
+
+local Home = NewPage("หน้าหลัก")
+local Eye = NewPage("ดวงตาเทพ")
+local Tools = NewPage("เครื่องมือ")
+local Troll = NewPage("เกรียน")
+local Settings = NewPage("ตั้งค่า")
+local Power = NewPage("พลัง")
+
+local function Panel(parent, title, pos, size)
+	local p = Instance.new("Frame")
+	p.Size = size
+	p.Position = pos
+	p.BackgroundColor3 = PANEL
+	p.Parent = parent
+
+	Corner(p, 11)
+	Stroke(p, Color3.fromRGB(42, 44, 54), 1)
+
+	Label(
+		p, title,
+		UDim2.new(1, -20, 0, 30),
+		UDim2.new(0, 12, 0, 4),
+		14, WHITE, Enum.Font.GothamBold
+	)
+
+	return p
+end
+
+--==================================================
+-- SCRIPT ROW (กดเปิดซ้ำได้)
+--==================================================
+
+local function ScriptRow(parent, name, yPos, url)
+	local row = Instance.new("Frame")
+	row.Name = name
+	row.Size = UDim2.new(1, -24, 0, 42)
+	row.Position = UDim2.new(0, 12, 0, yPos)
+	row.BackgroundColor3 = PANEL2
+	row.Parent = parent
+
+	Corner(row, 8)
+
+	Label(
+		row, name,
+		UDim2.new(1, -110, 1, 0),
+		UDim2.new(0, 12, 0, 0),
+		13, WHITE, Enum.Font.GothamMedium
+	)
+
+	local button = Instance.new("TextButton")
+	button.Name = name .. "_Button"
+	button.Size = UDim2.new(0, 78, 0, 26)
+	button.Position = UDim2.new(1, -88, 0.5, -13)
+	button.BackgroundColor3 = RED
+	button.Text = "เปิด"
+	button.TextColor3 = WHITE
+	button.TextSize = 11
+	button.Font = Enum.Font.GothamMedium
+	button.AutoButtonColor = false
+	button.Parent = row
+
+	Corner(button, 6)
+
+	local busy = false
+
+	button.MouseButton1Click:Connect(function()
+		if busy then
+			return
+		end
+
+		busy = true
+		button.Text = "..."
+
+		local ok = pcall(function()
+			loadstring(game:HttpGet(url))()
+		end)
+
+		if ok then
+			button.Text = "เปิดแล้ว ✓"
+			button.BackgroundColor3 = GREEN
+		else
+			button.Text = "ผิดพลาด"
+		end
+
+		task.delay(1.2, function()
+			if button.Parent then
+				button.Text = "เปิด"
+				button.BackgroundColor3 = RED
+			end
+			busy = false
+		end)
+	end)
+
+	return row
+end
+
+--==================================================
+-- TOGGLE ROW (เปิด/ปิดฟีเจอร์ built-in)
+--==================================================
+
+local function ToggleRow(parent, name, yPos, onEnable, onDisable)
+	local row = Instance.new("Frame")
+	row.Name = name
+	row.Size = UDim2.new(1, -24, 0, 42)
+	row.Position = UDim2.new(0, 12, 0, yPos)
+	row.BackgroundColor3 = PANEL2
+	row.Parent = parent
+
+	Corner(row, 8)
+
+	Label(
+		row, name,
+		UDim2.new(1, -110, 1, 0),
+		UDim2.new(0, 12, 0, 0),
+		13, WHITE, Enum.Font.GothamMedium
+	)
+
+	local togOn = false
+
+	local track = Instance.new("Frame")
+	track.Size = UDim2.new(0, 46, 0, 24)
+	track.Position = UDim2.new(1, -64, 0.5, -12)
+	track.BackgroundColor3 = DARKGRAY
+	track.Parent = row
+	Corner(track, 20)
+
+	local knob = Instance.new("Frame")
+	knob.Size = UDim2.new(0, 18, 0, 18)
+	knob.Position = UDim2.new(0, 3, 0.5, -9)
+	knob.BackgroundColor3 = WHITE
+	knob.Parent = track
+	Corner(knob, 20)
+
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(1, 0, 1, 0)
+	btn.BackgroundTransparency = 1
+	btn.Text = ""
+	btn.Parent = track
+
+	btn.MouseButton1Click:Connect(function()
+		togOn = not togOn
+		if togOn then
+			TweenService:Create(track, TweenInfo.new(0.15), { BackgroundColor3 = GREEN }):Play()
+			TweenService:Create(knob, TweenInfo.new(0.15), { Position = UDim2.new(1, -21, 0.5, -9) }):Play()
+			pcall(onEnable)
+		else
+			TweenService:Create(track, TweenInfo.new(0.15), { BackgroundColor3 = DARKGRAY }):Play()
+			TweenService:Create(knob, TweenInfo.new(0.15), { Position = UDim2.new(0, 3, 0.5, -9) }):Play()
+			pcall(onDisable)
+		end
+	end)
+
+	return row
+end
+
+--==================================================
+-- NOCLIP BACKEND
+--==================================================
+
+local NoclipActive = false
+local NoclipConn   = nil
+
+local function EnableNoclip()
+	NoclipActive = true
+	NoclipConn = RunService.Stepped:Connect(function()
+		local char = Player.Character
+		if not char then return end
+		for _, p in pairs(char:GetDescendants()) do
+			if p:IsA("BasePart") then
+				p.CanCollide = false
+			end
+		end
+	end)
+end
+
+local function DisableNoclip()
+	NoclipActive = false
+	if NoclipConn then
+		NoclipConn:Disconnect()
+		NoclipConn = nil
+	end
+	local char = Player.Character
+	if not char then return end
+	for _, p in pairs(char:GetDescendants()) do
+		if p:IsA("BasePart") then
+			p.CanCollide = true
+		end
+	end
+end
+
+--==================================================
+-- INFINITE JUMP BACKEND
+--==================================================
+
+local InfJumpActive = false
+local InfJumpConn   = nil
+
+local function EnableInfJump()
+	InfJumpActive = true
+	InfJumpConn = UserInputService.JumpRequest:Connect(function()
+		local char = Player.Character
+		local hum  = char and char:FindFirstChildOfClass("Humanoid")
+		if hum and hum.FloorMaterial == Enum.Material.Air then
+			hum:ChangeState(Enum.HumanoidStateType.Jumping)
+		end
+	end)
+end
+
+local function DisableInfJump()
+	InfJumpActive = false
+	if InfJumpConn then
+		InfJumpConn:Disconnect()
+		InfJumpConn = nil
+	end
+end
+
+Player.CharacterAdded:Connect(function()
+	task.wait(0.5)
+	if NoclipActive  then EnableNoclip()  end
+	if InfJumpActive then EnableInfJump() end
+	if TPToolActive  then CreateTPTool()  end
+end)
+
+--==================================================
+-- TP NEXORA BACKEND
+--==================================================
+
+TPToolActive  = false
+local TPTool  = nil
+local TPRespawnConn = nil
+
+function CreateTPTool()
+	local bp   = Player.Backpack
+	local char = Player.Character
+	if not bp or not char then return end
+
+	for _, v in pairs(bp:GetChildren()) do
+		if v.Name == "TP NEXORA" then v:Destroy() end
+	end
+	for _, v in pairs(char:GetChildren()) do
+		if v.Name == "TP NEXORA" then v:Destroy() end
+	end
+
+	local tool = Instance.new("Tool")
+	tool.Name           = "TP NEXORA"
+	tool.RequiresHandle = false
+	tool.CanBeDropped   = false
+	tool.ToolTip        = "ถือแล้วกดตรงไหนในแมพ → วาร์ปทันที"
+	tool.Parent         = bp
+
+	local handle = Instance.new("Part")
+	handle.Name            = "Handle"
+	handle.Size            = Vector3.new(0.1, 0.1, 0.1)
+	handle.Transparency    = 1
+	handle.CanCollide      = false
+	handle.Massless        = true
+	handle.Parent          = tool
+
+	tool.Activated:Connect(function()
+		local mouse   = Player:GetMouse()
+		local camPart = workspace.CurrentCamera
+		if not camPart then return end
+
+		local unitRay = camPart:ScreenPointToRay(mouse.X, mouse.Y)
+		local rp      = RaycastParams.new()
+		rp.FilterType = Enum.RaycastFilterType.Exclude
+		rp.FilterDescendantsInstances = { Player.Character }
+
+		local result = workspace:Raycast(unitRay.Origin, unitRay.Direction * 3000, rp)
+		if not result then return end
+
+		local landPos = result.Position + Vector3.new(0, 3.5, 0)
+
+		local c2  = Player.Character
+		local hrp = c2 and c2:FindFirstChild("HumanoidRootPart")
+		if not hrp then return end
+
+		hrp.CFrame = CFrame.new(landPos)
+
+		local flash = Instance.new("SelectionBox")
+		flash.Color3     = Color3.fromRGB(255, 25, 45)
+		flash.SurfaceColor3 = Color3.fromRGB(255, 25, 45)
+		flash.LineThickness  = 0.04
+		flash.SurfaceTransparency = 0.7
+		flash.Adornee    = hrp
+		flash.Parent     = hrp
+		TweenService:Create(flash, TweenInfo.new(0.35), { SurfaceTransparency = 1, LineThickness = 0 }):Play()
+		game:GetService("Debris"):AddItem(flash, 0.4)
+	end)
+
+	TPTool = tool
+end
+
+local function EnableTPTool()
+	TPToolActive = true
+	CreateTPTool()
+	if TPRespawnConn then TPRespawnConn:Disconnect() end
+	TPRespawnConn = Player.CharacterAdded:Connect(function()
+		task.wait(0.8)
+		if TPToolActive then CreateTPTool() end
+	end)
+end
+
+local function DisableTPTool()
+	TPToolActive = false
+	if TPRespawnConn then TPRespawnConn:Disconnect(); TPRespawnConn = nil end
+	local bp = Player.Backpack
+	if bp then
+		for _, v in pairs(bp:GetChildren()) do
+			if v.Name == "TP NEXORA" then v:Destroy() end
+		end
+	end
+	local char = Player.Character
+	if char then
+		for _, v in pairs(char:GetChildren()) do
+			if v.Name == "TP NEXORA" then v:Destroy() end
+		end
+	end
+	TPTool = nil
+end
+
+--==================================================
+-- HOME PAGE
+--==================================================
+
+local Info = Panel(
+	Home, "◆  ข้อมูลผู้เล่น",
+	UDim2.new(0, 0, 0, 0),
+	UDim2.new(1, 0, 0, 255)
+)
+
+local CharacterImage = Instance.new("ImageLabel")
+CharacterImage.Size = UDim2.new(0, 92, 0, 92)
+CharacterImage.Position = UDim2.new(0, 13, 0, 48)
+CharacterImage.BackgroundColor3 = PANEL2
+CharacterImage.Parent = Info
+
+Corner(CharacterImage, 10)
+Stroke(CharacterImage, RED, 1)
+
+pcall(function()
+	CharacterImage.Image = Players:GetUserThumbnailAsync(
+		Player.UserId,
+		Enum.ThumbnailType.AvatarBust,
+		Enum.ThumbnailSize.Size150x150
+	)
+end)
+
+Label(Info, "ชื่อผู้ใช้", UDim2.new(0, 100, 0, 17), UDim2.new(0, 120, 0, 48), 10, GRAY)
+
+Label(Info, Player.Name, UDim2.new(0, 180, 0, 23), UDim2.new(0, 120, 0, 64), 14, WHITE, Enum.Font.GothamBold)
+
+Label(Info, "เกมที่กำลังเล่น", UDim2.new(0, 120, 0, 17), UDim2.new(0, 120, 0, 91), 10, GRAY)
+
+local GameLabel = Label(
+	Info, "กำลังโหลดชื่อแมพ...",
+	UDim2.new(0, 210, 0, 22),
+	UDim2.new(0, 120, 0, 106),
+	12, WHITE, Enum.Font.GothamMedium
+)
+
+task.spawn(function()
+	local success, info = pcall(function()
+		return MarketplaceService:GetProductInfo(game.PlaceId, Enum.InfoType.Asset)
+	end)
+
+	if success and info and info.Name then
+		GameLabel.Text = info.Name
+	else
+		GameLabel.Text = game.Name
+	end
+end)
+
+Label(
+	Info, "🔗  ลิงก์ดิสคอร์ด",
+	UDim2.new(0, 180, 0, 22),
+	UDim2.new(0, 13, 0, 148),
+	12, WHITE, Enum.Font.GothamBold
+)
+
+local DiscordLinkBox = Instance.new("TextLabel")
+DiscordLinkBox.Size = UDim2.new(0, 245, 0, 32)
+DiscordLinkBox.Position = UDim2.new(0, 13, 0, 177)
+DiscordLinkBox.BackgroundColor3 = PANEL2
+DiscordLinkBox.Text = "discord.gg/Hvyf8crug"
+DiscordLinkBox.TextColor3 = GRAY
+DiscordLinkBox.TextSize = 11
+DiscordLinkBox.Font = Enum.Font.Gotham
+DiscordLinkBox.TextXAlignment = Enum.TextXAlignment.Center
+DiscordLinkBox.Parent = Info
+
+Corner(DiscordLinkBox, 7)
+Stroke(DiscordLinkBox, DARKGRAY, 1)
+
+local CopyDiscord = Instance.new("TextButton")
+CopyDiscord.Size = UDim2.new(0, 80, 0, 32)
+CopyDiscord.Position = UDim2.new(0, 265, 0, 177)
+CopyDiscord.BackgroundColor3 = RED
+CopyDiscord.Text = "คัดลอก"
+CopyDiscord.TextColor3 = WHITE
+CopyDiscord.TextSize = 11
+CopyDiscord.Font = Enum.Font.GothamBold
+CopyDiscord.AutoButtonColor = false
+CopyDiscord.Parent = Info
+
+Corner(CopyDiscord, 7)
+
+CopyDiscord.MouseButton1Click:Connect(function()
+	if setclipboard then
+		pcall(function()
+			setclipboard("https://discord.gg/Hvyf8crug")
+		end)
+	end
+
+	CopyDiscord.Text = "คัดลอกแล้ว ✓"
+
+	task.delay(1.2, function()
+		if CopyDiscord.Parent then
+			CopyDiscord.Text = "คัดลอก"
+		end
+	end)
+end)
+
+--==================================================
+-- STATS
+--==================================================
+
+local Stats = Instance.new("Frame")
+Stats.Size = UDim2.new(0, 185, 0, 100)
+Stats.Position = UDim2.new(1, -198, 0, 45)
+Stats.BackgroundTransparency = 1
+Stats.Parent = Info
+
+Label(Stats, "♥  HP", UDim2.new(0, 70, 0, 20), UDim2.new(0, 0, 0, 0), 12, WHITE, Enum.Font.GothamBold)
+
+local HPBarBG = Instance.new("Frame")
+HPBarBG.Size = UDim2.new(0, 120, 0, 8)
+HPBarBG.Position = UDim2.new(0, 0, 0, 25)
+HPBarBG.BackgroundColor3 = DARKGRAY
+HPBarBG.Parent = Stats
+Corner(HPBarBG, 8)
+
+local HPBar = Instance.new("Frame")
+HPBar.Size = UDim2.new(1, 0, 1, 0)
+HPBar.BackgroundColor3 = GREEN
+HPBar.Parent = HPBarBG
+Corner(HPBar, 8)
+
+local HPText = Label(Stats, "100/100", UDim2.new(0, 60, 0, 18), UDim2.new(0, 125, 0, 20), 10, WHITE, Enum.Font.GothamBold)
+
+Label(Stats, "▣  FPS", UDim2.new(0, 70, 0, 20), UDim2.new(0, 0, 0, 53), 12, WHITE, Enum.Font.GothamBold)
+
+local FPSBarBG = Instance.new("Frame")
+FPSBarBG.Size = UDim2.new(0, 120, 0, 8)
+FPSBarBG.Position = UDim2.new(0, 0, 0, 78)
+FPSBarBG.BackgroundColor3 = DARKGRAY
+FPSBarBG.Parent = Stats
+Corner(FPSBarBG, 8)
+
+local FPSBar = Instance.new("Frame")
+FPSBar.Size = UDim2.new(0.5, 0, 1, 0)
+FPSBar.BackgroundColor3 = RED
+FPSBar.Parent = FPSBarBG
+Corner(FPSBar, 8)
+
+local FPSText = Label(Stats, "0", UDim2.new(0, 60, 0, 18), UDim2.new(0, 125, 0, 73), 10, WHITE, Enum.Font.GothamBold)
+
+local function UpdateHP()
+	local character = Player.Character
+	if not character then return end
+
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	if not humanoid then return end
+
+	local hp = math.floor(humanoid.Health + 0.5)
+	local maxHP = math.floor(humanoid.MaxHealth + 0.5)
+
+	HPText.Text = hp .. "/" .. maxHP
+
+	local percent = 0
+	if maxHP > 0 then
+		percent = math.clamp(humanoid.Health / humanoid.MaxHealth, 0, 1)
+	end
+
+	HPBar.Size = UDim2.new(percent, 0, 1, 0)
+end
+
+RunService.Heartbeat:Connect(UpdateHP)
+
+Player.CharacterAdded:Connect(function()
+	task.wait(1)
+	UpdateHP()
+end)
+
+local Frames = 0
+local LastFPS = os.clock()
+
+RunService.RenderStepped:Connect(function()
+	Frames += 1
+
+	local now = os.clock()
+
+	if now - LastFPS >= 0.5 then
+		local fps = math.floor(Frames / (now - LastFPS) + 0.5)
+
+		FPSText.Text = tostring(fps)
+		FPSBar.Size = UDim2.new(math.clamp(fps / 120, 0, 1), 0, 1, 0)
+
+		Frames = 0
+		LastFPS = now
+	end
+end)
+
+--==================================================
+-- EYE PAGE (ดวงตาเทพ)
+--==================================================
+
+local EyePanel = Panel(Eye, "◉  ดวงตาเทพ", UDim2.new(0, 0, 0, 0), UDim2.new(1, 0, 0, 255))
+
+ScriptRow(EyePanel, "ESP", 44,
+	"https://pastefy.app/EquyCt5x/raw")
+
+ScriptRow(EyePanel, "ขยาย Hit box", 94,
+	"https://dpaste.com/39ARWS68G.txt")
+
+ScriptRow(EyePanel, "ล็อกหัว", 144,
+	"https://dpaste.com/6NQUD6Q7G.txt")
+
+--==================================================
+-- TOOLS PAGE (เครื่องมือ)
+--==================================================
+
+local ToolsPanel = Panel(Tools, "⚒  เครื่องมือ", UDim2.new(0, 0, 0, 0), UDim2.new(1, 0, 0, 340))
+
+ScriptRow(ToolsPanel, "บิน", 44,
+	"https://rawscripts.net/raw/Universal-Script-fly-v3-by-hibatzzz-243731")
+
+ScriptRow(ToolsPanel, "ปรับสปีด", 94,
+	"https://pastefy.app/bwltAIA7/raw")
+
+ScriptRow(ToolsPanel, "เดินออโต้", 144,
+	"https://pastefy.app/aRv0T7xo/raw")
+
+ToggleRow(ToolsPanel, "🔵  ทะลุได้ทุกอย่าง (Noclip)", 194, EnableNoclip, DisableNoclip)
+
+ToggleRow(ToolsPanel, "🟢  กระโดดไม่จำกัด (Inf Jump)", 244, EnableInfJump, DisableInfJump)
+
+ToggleRow(ToolsPanel, "🔴  TP NEXORA (รับของใน Bag)", 294, EnableTPTool, DisableTPTool)
+
+--==================================================
+-- TROLL PAGE (เกรียน)
+--==================================================
+
+local TrollPanel = Panel(Troll, "🚀  เกรียน", UDim2.new(0, 0, 0, 0), UDim2.new(1, 0, 0, 255))
+
+ScriptRow(TrollPanel, "ดีดคนออกแมพ", 44,
+	"https://raw.githubusercontent.com/dmjk2885-ship-it/GKHUB-/refs/heads/main/%E0%B8%AA%E0%B8%84%E0%B8%A3%E0%B8%B4%E0%B8%9B%E0%B8%94%E0%B8%B5%E0%B8%94%E0%B8%84%E0%B8%99%E0%B8%AD%E0%B8%AD%E0%B8%81%E0%B9%80%E0%B9%80%E0%B8%A1%E0%B8%9E")
+
+--==================================================
+-- POWER PAGE HELPERS
+--==================================================
+
+local function SectionHdr(parent, text)
+	local h = Instance.new("Frame")
+	h.Size = UDim2.new(1, 0, 0, 22)
+	h.BackgroundTransparency = 1
+	h.Parent = parent
+
+	local bar = Instance.new("Frame")
+	bar.Size = UDim2.fromOffset(3, 14)
+	bar.Position = UDim2.fromOffset(0, 4)
+	bar.BackgroundColor3 = RED
+	bar.BorderSizePixel = 0
+	bar.Parent = h
+	Corner(bar, 2)
+
+	Label(h, text:upper(), UDim2.new(1, -12, 1, 0), UDim2.fromOffset(9, 0), 10, GRAY, Enum.Font.GothamBold)
+end
+
+local function InputToggleRow(parent, name, placeholder, onEnable, onDisable)
+	local ctr = Instance.new("Frame")
+	ctr.Size = UDim2.new(1, 0, 0, 72)
+	ctr.BackgroundColor3 = PANEL2
+	ctr.Parent = parent
+	Corner(ctr, 8)
+
+	Label(ctr, name, UDim2.new(1, -72, 0, 22), UDim2.fromOffset(10, 4), 12, WHITE, Enum.Font.GothamSemibold)
+
+	local box = Instance.new("TextBox")
+	box.Size = UDim2.new(1, -24, 0, 26)
+	box.Position = UDim2.fromOffset(10, 34)
+	box.BackgroundColor3 = Color3.fromRGB(26, 28, 38)
+	box.Text = ""
+	box.PlaceholderText = placeholder or "..."
+	box.PlaceholderColor3 = GRAY
+	box.TextColor3 = WHITE
+	box.TextSize = 11
+	box.Font = Enum.Font.Gotham
+	box.ClearTextOnFocus = false
+	box.Parent = ctr
+	Corner(box, 5)
+	Stroke(box, DARKGRAY, 1)
+
+	local togOn = false
+	local track = Instance.new("Frame")
+	track.Size = UDim2.fromOffset(46, 24)
+	track.Position = UDim2.new(1, -58, 0, 6)
+	track.BackgroundColor3 = DARKGRAY
+	track.Parent = ctr
+	Corner(track, 20)
+
+	local knob = Instance.new("Frame")
+	knob.Size = UDim2.fromOffset(18, 18)
+	knob.Position = UDim2.fromOffset(3, 3)
+	knob.BackgroundColor3 = WHITE
+	knob.Parent = track
+	Corner(knob, 20)
+
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.fromScale(1, 1)
+	btn.BackgroundTransparency = 1
+	btn.Text = ""
+	btn.Parent = track
+
+	btn.MouseButton1Click:Connect(function()
+		togOn = not togOn
+		TweenService:Create(track, TweenInfo.new(0.15), { BackgroundColor3 = togOn and GREEN or DARKGRAY }):Play()
+		TweenService:Create(knob, TweenInfo.new(0.15), {
+			Position = togOn and UDim2.fromOffset(25, 3) or UDim2.fromOffset(3, 3)
+		}):Play()
+		if togOn then pcall(function() onEnable(box.Text) end)
+		else pcall(onDisable) end
+	end)
+
+	return { box = box }
+end
+
+local function ActionButton(parent, name, btnTxt, onClick)
+	local row = Instance.new("Frame")
+	row.Size = UDim2.new(1, 0, 0, 42)
+	row.BackgroundColor3 = PANEL2
+	row.Parent = parent
+	Corner(row, 8)
+
+	Label(row, name, UDim2.new(1, -110, 1, 0), UDim2.fromOffset(10, 0), 12, WHITE, Enum.Font.GothamMedium)
+
+	local b = Instance.new("TextButton")
+	b.Size = UDim2.fromOffset(78, 26)
+	b.Position = UDim2.new(1, -90, 0.5, -13)
+	b.BackgroundColor3 = RED
+	b.Text = btnTxt or "เปิด"
+	b.TextColor3 = WHITE
+	b.TextSize = 11
+	b.Font = Enum.Font.GothamMedium
+	b.AutoButtonColor = false
+	b.Parent = row
+	Corner(b, 6)
+
+	local busy = false
+	b.MouseButton1Click:Connect(function()
+		if busy then return end
+		busy = true
+		b.BackgroundColor3 = Color3.fromRGB(130, 25, 35)
+		pcall(function() onClick() end)
+		task.delay(0.6, function()
+			if b.Parent then b.BackgroundColor3 = RED end
+			busy = false
+		end)
+	end)
+	return b
+end
+
+local function InputActionButton(parent, name, placeholder, btnTxt, onClick)
+	local ctr = Instance.new("Frame")
+	ctr.Size = UDim2.new(1, 0, 0, 72)
+	ctr.BackgroundColor3 = PANEL2
+	ctr.Parent = parent
+	Corner(ctr, 8)
+
+	Label(ctr, name, UDim2.new(1, -92, 0, 22), UDim2.fromOffset(10, 4), 12, WHITE, Enum.Font.GothamSemibold)
+
+	local box = Instance.new("TextBox")
+	box.Size = UDim2.new(1, -24, 0, 26)
+	box.Position = UDim2.fromOffset(10, 34)
+	box.BackgroundColor3 = Color3.fromRGB(26, 28, 38)
+	box.Text = ""
+	box.PlaceholderText = placeholder or "..."
+	box.PlaceholderColor3 = GRAY
+	box.TextColor3 = WHITE
+	box.TextSize = 11
+	box.Font = Enum.Font.Gotham
+	box.ClearTextOnFocus = false
+	box.Parent = ctr
+	Corner(box, 5)
+	Stroke(box, DARKGRAY, 1)
+
+	local b = Instance.new("TextButton")
+	b.Size = UDim2.fromOffset(78, 26)
+	b.Position = UDim2.new(1, -90, 0, 6)
+	b.BackgroundColor3 = RED
+	b.Text = btnTxt or "เปิด"
+	b.TextColor3 = WHITE
+	b.TextSize = 11
+	b.Font = Enum.Font.GothamMedium
+	b.AutoButtonColor = false
+	b.Parent = ctr
+	Corner(b, 6)
+
+	b.MouseButton1Click:Connect(function()
+		pcall(function() onClick(box.Text) end)
+	end)
+	return { box = box, btn = b }
+end
+
+--==================================================
+-- 15 FEATURE BACKENDS
+--==================================================
+
+-- Shared helpers
+local function GetChar()   return Player.Character end
+local function GetHRP(c)   return c and c:FindFirstChild("HumanoidRootPart") end
+local function GetHum(c)   return c and c:FindFirstChildOfClass("Humanoid") end
+local function GetDefSpeed()
+	local h = GetHum(GetChar())
+	return h and h.WalkSpeed or 16
+end
+
+-- 1. Walk To Player
+local _walkToConn, _walkToActive = nil, false
+local function EnableWalkTo(tname)
+	_walkToActive = true
+	if _walkToConn then _walkToConn:Disconnect() end
+	_walkToConn = RunService.Heartbeat:Connect(function()
+		xpcall(function()
+			local c = GetChar(); local h = GetHum(c)
+			if not h then return end
+			local tp = Players:FindFirstChild(tname)
+			local tr = tp and GetHRP(tp.Character)
+			if tr then h:MoveTo(tr.Position) end
+		end, function() end)
+	end)
+end
+local function DisableWalkTo()
+	_walkToActive = false
+	if _walkToConn then _walkToConn:Disconnect(); _walkToConn = nil end
+end
+
+-- 2. TP to Player (Loop)
+local _tpLoopConn = nil
+local function EnableTPLoop(tname)
+	if _tpLoopConn then _tpLoopConn:Disconnect() end
+	_tpLoopConn = RunService.Heartbeat:Connect(function()
+		xpcall(function()
+			local hrp = GetHRP(GetChar())
+			if not hrp then return end
+			local tp = Players:FindFirstChild(tname)
+			local tr = tp and GetHRP(tp.Character)
+			if tr then hrp.CFrame = tr.CFrame * CFrame.new(0, 0, 3) end
+		end, function() end)
+	end)
+end
+local function DisableTPLoop()
+	if _tpLoopConn then _tpLoopConn:Disconnect(); _tpLoopConn = nil end
+end
+
+-- 3. Walk Fling  (velocity spike from IY source)
+local _flingActive, _flingConn, _flingNoclipConn = false, nil, nil
+local _flingOrigSpeed = 16
+local function EnableWalkFling()
+	_flingActive = true
+	local c = GetChar(); local h = GetHum(c); local hrp = GetHRP(c)
+	if not h or not hrp then return end
+	_flingOrigSpeed = h.WalkSpeed
+	-- noclip so we don't get stopped by walls
+	_flingNoclipConn = RunService.Stepped:Connect(function()
+		local ch = GetChar(); if not ch then return end
+		for _, p in pairs(ch:GetDescendants()) do
+			if p:IsA("BasePart") then p.CanCollide = false end
+		end
+	end)
+	_flingConn = RunService.Heartbeat:Connect(function()
+		xpcall(function()
+			local ch = GetChar(); local root = GetHRP(ch)
+			if not root then return end
+			local vel = root.AssemblyLinearVelocity
+			root.AssemblyLinearVelocity = vel * 10000 + Vector3.new(0, 10000, 0)
+			RunService.RenderStepped:Wait()
+			if root and root.Parent then root.AssemblyLinearVelocity = vel end
+		end, function() end)
+	end)
+end
+local function DisableWalkFling()
+	_flingActive = false
+	if _flingConn then _flingConn:Disconnect(); _flingConn = nil end
+	if _flingNoclipConn then _flingNoclipConn:Disconnect(); _flingNoclipConn = nil end
+	local c = GetChar(); local h = GetHum(c)
+	if h then h.WalkSpeed = _flingOrigSpeed end
+	if c then
+		for _, p in pairs(c:GetDescendants()) do
+			if p:IsA("BasePart") then pcall(function() p.CanCollide = true end) end
+		end
+	end
+end
+
+-- 4. Invisible – ToolInvis (from IY: box at y=10000, HRP swap)
+local _invisActive = false
+local function EnableServerInvis()
+	_invisActive = true
+	xpcall(function()
+		local char = GetChar(); local hrp = GetHRP(char)
+		if not char or not hrp then return end
+		local loc = hrp.Position
+		local box = Instance.new("Part")
+		box.Anchored = true; box.CanCollide = true
+		box.Size = Vector3.new(10, 1, 10)
+		box.Position = Vector3.new(0, 10000, 0)
+		box.Parent = workspace
+		local touched = false
+		local conn; conn = box.Touched:Connect(function(part)
+			if part:IsDescendantOf(char) and not touched then
+				touched = true
+				task.delay(0.25, function()
+					xpcall(function()
+						local no = hrp:Clone()
+						hrp:Destroy()
+						no.Parent = char
+						char:MoveTo(loc)
+					end, function() end)
+					touched = false
+				end)
+			end
+		end)
+		char:MoveTo(box.Position + Vector3.new(0, 1, 0))
+		task.delay(2, function()
+			pcall(function() conn:Disconnect(); box:Destroy() end)
+		end)
+	end, function() end)
+end
+local function DisableServerInvis()
+	_invisActive = false
+	xpcall(function()
+		local c = GetChar()
+		if not c then return end
+		for _, p in pairs(c:GetDescendants()) do
+			pcall(function()
+				if p:IsA("BasePart") then p.LocalTransparencyModifier = 0 end
+			end)
+		end
+	end, function() end)
+end
+
+-- 5. Title (Billboard above head)
+local _titleGui = nil
+local function SetTitle(text)
+	if _titleGui then pcall(function() _titleGui:Destroy() end); _titleGui = nil end
+	if not text or text == "" then return end
+	xpcall(function()
+		local c = GetChar(); local head = c and c:FindFirstChild("Head")
+		if not head then return end
+		local bg = Instance.new("BillboardGui")
+		bg.Name = "NEXORA_Title"
+		bg.Size = UDim2.fromOffset(220, 30)
+		bg.StudsOffset = Vector3.new(0, 2.8, 0)
+		bg.AlwaysOnTop = true
+		bg.Parent = head
+		local lbl = Instance.new("TextLabel")
+		lbl.BackgroundTransparency = 1
+		lbl.Size = UDim2.fromScale(1, 1)
+		lbl.Text = text
+		lbl.TextColor3 = WHITE
+		lbl.TextSize = 14
+		lbl.Font = Enum.Font.GothamBold
+		lbl.TextStrokeTransparency = 0.5
+		lbl.TextStrokeColor3 = RED
+		lbl.Parent = bg
+		_titleGui = bg
+	end, function() end)
+end
+local function RemoveTitle() SetTitle("") end
+
+-- 6. Rejoin
+local function DoRejoin()
+	xpcall(function()
+		if queueteleport then
+			queueteleport("")
+		end
+		TeleportService:Teleport(game.PlaceId, Player)
+	end, function() end)
+end
+
+-- 7. Server Hop
+local function DoServerHop()
+	task.spawn(function()
+		xpcall(function()
+			local req = game:HttpGet("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true")
+			local body = HttpService:JSONDecode(req)
+			local servers = {}
+			if body and body.data then
+				for _, v in pairs(body.data) do
+					if type(v) == "table" and v.id and v.id ~= game.JobId then
+						table.insert(servers, v.id)
+					end
+				end
+			end
+			if #servers > 0 then
+				TeleportService:TeleportToPlaceInstance(game.PlaceId, servers[math.random(1, #servers)], Player)
+			else
+				TeleportService:Teleport(game.PlaceId, Player)
+			end
+		end, function(e)
+			pcall(function() TeleportService:Teleport(game.PlaceId, Player) end)
+		end)
+	end)
+end
+
+-- 8. FPS Boost (from IY antilag)
+local function EnableFPSBoost()
+	xpcall(function()
+		local t = workspace:FindFirstChildWhichIsA("Terrain")
+		if t then t.WaterWaveSize = 0; t.WaterWaveSpeed = 0; t.WaterReflectance = 0; t.WaterTransparency = 1 end
+		Lighting.GlobalShadows = false; Lighting.FogEnd = 9e9; Lighting.FogStart = 9e9
+		pcall(function() settings().Rendering.QualityLevel = 1 end)
+		for _, v in pairs(game:GetDescendants()) do
+			pcall(function()
+				if v:IsA("BasePart") then v.CastShadow = false; v.Material = Enum.Material.Plastic; v.Reflectance = 0
+				elseif v:IsA("Decal") then v.Transparency = 1
+				elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then v.Lifetime = NumberRange.new(0) end
+			end)
+		end
+		for _, v in pairs(Lighting:GetDescendants()) do
+			pcall(function() if v:IsA("PostEffect") then v.Enabled = false end end)
+		end
+	end, function() end)
+end
+
+-- 9. Low Graphic
+local _lgOrigShadows = true
+local function EnableLowGraphic()
+	xpcall(function()
+		_lgOrigShadows = Lighting.GlobalShadows
+		Lighting.GlobalShadows = false
+		pcall(function() settings().Rendering.QualityLevel = 3 end)
+		for _, v in pairs(Lighting:GetDescendants()) do
+			pcall(function() if v:IsA("PostEffect") then v.Enabled = false end end)
+		end
+	end, function() end)
+end
+local function DisableLowGraphic()
+	xpcall(function() Lighting.GlobalShadows = _lgOrigShadows end, function() end)
+end
+
+-- 10. Set Spawn Point + Auto
+local _spawnCF = nil
+local _autoSpawnConn = nil
+local function SaveSpawnPoint()
+	local hrp = GetHRP(GetChar())
+	if hrp then _spawnCF = hrp.CFrame end
+end
+local function EnableAutoSpawn()
+	SaveSpawnPoint()
+	if _autoSpawnConn then _autoSpawnConn:Disconnect() end
+	_autoSpawnConn = Player.CharacterAdded:Connect(function(char)
+		task.wait(0.6)
+		local hrp = char:FindFirstChild("HumanoidRootPart")
+		if hrp and _spawnCF then hrp.CFrame = _spawnCF end
+	end)
+end
+local function DisableAutoSpawn()
+	if _autoSpawnConn then _autoSpawnConn:Disconnect(); _autoSpawnConn = nil end
+end
+
+-- 11. Swim Air (from IY swim command)
+local _swimConn = nil
+local function EnableSwimAir()
+	if _swimConn then _swimConn:Disconnect() end
+	local c = GetChar(); local h = GetHum(c)
+	if h then
+		for _, v in pairs(Enum.HumanoidStateType:GetEnumItems()) do
+			pcall(function() if v ~= Enum.HumanoidStateType.None then h:SetStateEnabled(v, false) end end)
+		end
+		pcall(function() h:ChangeState(Enum.HumanoidStateType.Swimming) end)
+	end
+	_swimConn = RunService.Heartbeat:Connect(function()
+		xpcall(function()
+			local ch = GetChar(); local hm = GetHum(ch); local hrp = GetHRP(ch)
+			if not hm or not hrp then return end
+			if hm.MoveDirection == Vector3.zero and not UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+				hrp.AssemblyLinearVelocity = Vector3.zero
+			end
+		end, function() end)
+	end)
+end
+local function DisableSwimAir()
+	if _swimConn then _swimConn:Disconnect(); _swimConn = nil end
+	xpcall(function()
+		local h = GetHum(GetChar())
+		if not h then return end
+		for _, v in pairs(Enum.HumanoidStateType:GetEnumItems()) do
+			pcall(function() h:SetStateEnabled(v, true) end)
+		end
+		pcall(function() h:ChangeState(Enum.HumanoidStateType.GettingUp) end)
+		workspace.Gravity = 196.2
+	end, function() end)
+end
+
+-- 12. Can't Touch / God Mode (from IY: clone humanoid, disable death states)
+local function EnableGodMode()
+	xpcall(function()
+		local cam = workspace.CurrentCamera
+		local c = GetChar(); local h = GetHum(c)
+		if not c or not h then return end
+		local camCF = cam.CFrame
+		local nh = h:Clone()
+		nh.Parent = c
+		Player.Character = nil
+		pcall(function()
+			nh:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+			nh:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+			nh.BreakJointsOnDeath = false
+		end)
+		h:Destroy()
+		Player.Character = c
+		cam.CameraSubject = nh
+		task.wait()
+		cam.CFrame = camCF
+		nh.Health = nh.MaxHealth
+		nh.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+		local anim = c:FindFirstChild("Animate")
+		if anim then anim.Disabled = true; task.wait(); anim.Disabled = false end
+	end, function() end)
+end
+
+-- 13. Noclip (Player only — character body parts, not tools/seats)
+local _noclipPoConn = nil
+local function EnableNoclipPlayerOnly()
+	if _noclipPoConn then _noclipPoConn:Disconnect() end
+	_noclipPoConn = RunService.Stepped:Connect(function()
+		xpcall(function()
+			local c = GetChar(); if not c then return end
+			for _, p in pairs(c:GetChildren()) do
+				if p:IsA("BasePart") and not p:IsA("Tool") then
+					p.CanCollide = false
+				end
+			end
+		end, function() end)
+	end)
+end
+local function DisableNoclipPlayerOnly()
+	if _noclipPoConn then _noclipPoConn:Disconnect(); _noclipPoConn = nil end
+	xpcall(function()
+		local c = GetChar(); if not c then return end
+		for _, p in pairs(c:GetChildren()) do
+			if p:IsA("BasePart") then pcall(function() p.CanCollide = true end) end
+		end
+	end, function() end)
+end
+
+-- 14a. Headless
+local _headlessOn = false
+local function EnableHeadless()
+	_headlessOn = true
+	xpcall(function()
+		local c = GetChar(); if not c then return end
+		local head = c:FindFirstChild("Head")
+		if head then
+			head.Transparency = 1
+			for _, d in pairs(head:GetChildren()) do
+				if d:IsA("Decal") then d.Transparency = 1 end
+			end
+		end
+		for _, acc in pairs(c:GetChildren()) do
+			if acc:IsA("Accessory") then
+				local handle = acc:FindFirstChild("Handle")
+				if handle then
+					local hrp = GetHRP(c)
+					if hrp then
+						local relY = (handle.Position - hrp.Position).Y
+						if relY > 0.8 then handle.Transparency = 1 end
+					end
+				end
+			end
+		end
+	end, function() end)
+end
+local function DisableHeadless()
+	_headlessOn = false
+	xpcall(function()
+		local c = GetChar(); if not c then return end
+		local head = c:FindFirstChild("Head")
+		if head then
+			head.Transparency = 0
+			for _, d in pairs(head:GetChildren()) do
+				if d:IsA("Decal") then d.Transparency = 0 end
+			end
+		end
+		for _, acc in pairs(c:GetChildren()) do
+			if acc:IsA("Accessory") then
+				local handle = acc:FindFirstChild("Handle")
+				if handle then handle.Transparency = 0 end
+			end
+		end
+	end, function() end)
+end
+
+-- 14b. Korblox
+local _korbloxOn = false
+local function EnableKorblox()
+	_korbloxOn = true
+	xpcall(function()
+		local c = GetChar(); if not c then return end
+		for _, p in pairs(c:GetChildren()) do
+			local n = p.Name:lower()
+			if p:IsA("BasePart") and (n == "leftleg" or n == "left leg" or n:find("leftlowerleg") or n:find("leftfoot") or n:find("leftupperleg")) then
+				p.Transparency = 1
+			end
+		end
+	end, function() end)
+end
+local function DisableKorblox()
+	_korbloxOn = false
+	xpcall(function()
+		local c = GetChar(); if not c then return end
+		for _, p in pairs(c:GetChildren()) do
+			local n = p.Name:lower()
+			if p:IsA("BasePart") and (n == "leftleg" or n == "left leg" or n:find("leftlowerleg") or n:find("leftfoot") or n:find("leftupperleg")) then
+				p.Transparency = 0
+			end
+		end
+	end, function() end)
+end
+
+-- 15. Play Animation ID
+local _currentAnimTrack = nil
+local function PlayAnimId(id)
+	xpcall(function()
+		local c = GetChar(); local h = GetHum(c)
+		if not h then return end
+		local numId = tostring(id):match("%d+")
+		if not numId then return end
+		if _currentAnimTrack then pcall(function() _currentAnimTrack:Stop() end) end
+		local animator = h:FindFirstChildOfClass("Animator")
+		if not animator then animator = Instance.new("Animator"); animator.Parent = h end
+		local anim = Instance.new("Animation")
+		anim.AnimationId = "rbxassetid://" .. numId
+		local track = animator:LoadAnimation(anim)
+		track.Priority = Enum.AnimationPriority.Action
+		track:Play()
+		_currentAnimTrack = track
+	end, function() end)
+end
+local function StopAnim()
+	if _currentAnimTrack then pcall(function() _currentAnimTrack:Stop() end); _currentAnimTrack = nil end
+end
+
+-- Re-apply headless/korblox/title/noclip after respawn
+Player.CharacterAdded:Connect(function(char)
+	task.wait(0.8)
+	if _headlessOn     then EnableHeadless() end
+	if _korbloxOn      then EnableKorblox() end
+	if _titleGui and _titleGui.Parent then
+		local txt = _titleGui:FindFirstChildOfClass("TextLabel")
+		if txt then SetTitle(txt.Text) end
+	end
+	if _noclipPoConn   then EnableNoclipPlayerOnly() end
+	if NoclipActive    then EnableNoclip() end
+	if InfJumpActive   then EnableInfJump() end
+	if TPToolActive    then CreateTPTool() end
+	if _swimConn       then EnableSwimAir() end
+end)
+
+--==================================================
+-- POWER PAGE LAYOUT  (ScrollingFrame)
+--==================================================
+
+local PowerScrollOuter = Instance.new("Frame")
+PowerScrollOuter.Size = UDim2.fromScale(1, 1)
+PowerScrollOuter.BackgroundColor3 = PANEL
+PowerScrollOuter.Parent = Power
+Corner(PowerScrollOuter, 11)
+Stroke(PowerScrollOuter, Color3.fromRGB(42, 44, 54), 1)
+
+Label(PowerScrollOuter, "⚡  พลัง", UDim2.new(1, -20, 0, 28), UDim2.fromOffset(12, 4), 14, WHITE, Enum.Font.GothamBold)
+
+local PSF = Instance.new("ScrollingFrame")
+PSF.Size = UDim2.new(1, -8, 1, -36)
+PSF.Position = UDim2.fromOffset(4, 34)
+PSF.BackgroundTransparency = 1
+PSF.BorderSizePixel = 0
+PSF.ScrollBarThickness = 3
+PSF.ScrollBarImageColor3 = RED
+PSF.CanvasSize = UDim2.new(0, 0, 0, 0)
+PSF.AutomaticCanvasSize = Enum.AutomaticSize.Y
+PSF.ScrollingDirection = Enum.ScrollingDirection.Y
+PSF.Parent = PowerScrollOuter
+
+local PSLayout = Instance.new("UIListLayout")
+PSLayout.Padding = UDim.new(0, 5)
+PSLayout.SortOrder = Enum.SortOrder.LayoutOrder
+PSLayout.Parent = PSF
+
+local PSPad = Instance.new("UIPadding")
+PSPad.PaddingTop = UDim.new(0, 4); PSPad.PaddingLeft = UDim.new(0, 4)
+PSPad.PaddingRight = UDim.new(0, 6); PSPad.PaddingBottom = UDim.new(0, 8)
+PSPad.Parent = PSF
+
+-- ── TP & WALK ──────────────────────────────────
+SectionHdr(PSF, "🎯  TP & WALK")
+
+InputToggleRow(PSF, "Walk To Player", "ชื่อผู้เล่น เช่น Player1",
+	function(n) EnableWalkTo(n) end, DisableWalkTo)
+
+InputToggleRow(PSF, "TP to Player (Loop)", "ชื่อผู้เล่น เช่น Player1",
+	function(n) EnableTPLoop(n) end, DisableTPLoop)
+
+ToggleRow(PSF, "⚡  Walk Fling", 0, EnableWalkFling, DisableWalkFling)
+
+-- ── STEALTH ──────────────────────────────────
+SectionHdr(PSF, "👤  STEALTH")
+
+ToggleRow(PSF, "👻  Invisible (Server Side)", 0, EnableServerInvis, DisableServerInvis)
+
+ToggleRow(PSF, "🛡  Can't Touch (God Mode)", 0, EnableGodMode, function()
+	local h = GetHum(GetChar())
+	if h then h.BreakJointsOnDeath = true end
+end)
+
+ToggleRow(PSF, "🔵  Noclip (Player Only)", 0, EnableNoclipPlayerOnly, DisableNoclipPlayerOnly)
+
+-- ── VISUAL ───────────────────────────────────
+SectionHdr(PSF, "🎨  VISUAL")
+
+local titleInput = InputActionButton(PSF, "Title (ชื่อเหนือหัว)", "ข้อความที่ต้องการแสดง", "ตั้งค่า",
+	function(txt) SetTitle(txt) end)
+ActionButton(PSF, "ลบ Title", "ลบ", RemoveTitle)
+
+ToggleRow(PSF, "💀  Headless", 0, EnableHeadless, DisableHeadless)
+ToggleRow(PSF, "🦴  Korblox (ขาซ้าย)", 0, EnableKorblox, DisableKorblox)
+
+-- ── SERVER / UTILITY ─────────────────────────
+SectionHdr(PSF, "🌐  SERVER & UTILITY")
+
+ActionButton(PSF, "Rejoin เกม", "Rejoin", DoRejoin)
+ActionButton(PSF, "Server Hop (เซิร์ฟใหม่)", "Hop", DoServerHop)
+
+ToggleRow(PSF, "⚡  FPS Boost (ต่ำสุด)", 0, EnableFPSBoost, function() end)
+ToggleRow(PSF, "🔆  Low Graphic", 0, EnableLowGraphic, DisableLowGraphic)
+
+local function SetSpawnAndShow()
+	SaveSpawnPoint()
+	local hrp = GetHRP(GetChar())
+	if hrp and _spawnCF then
+		local p = _spawnCF.Position
+		-- feedback via SetSpawn label can go here
+	end
+end
+ActionButton(PSF, "บันทึก Spawn Point (ตำแหน่งปัจจุบัน)", "บันทึก", SetSpawnAndShow)
+ToggleRow(PSF, "🔄  Auto Spawn (TP หลัง respawn)", 0, EnableAutoSpawn, DisableAutoSpawn)
+
+-- ── MOVEMENT ─────────────────────────────────
+SectionHdr(PSF, "🌊  MOVEMENT")
+
+ToggleRow(PSF, "🌊  Swim Air (ว่ายในอากาศ)", 0, EnableSwimAir, DisableSwimAir)
+
+-- ── ANIMATION ────────────────────────────────
+SectionHdr(PSF, "💃  ANIMATION")
+
+InputActionButton(PSF, "Play Animation ID", "Animation ID เช่น 507770239", "เล่น",
+	function(id) PlayAnimId(id) end)
+ActionButton(PSF, "หยุด Animation", "หยุด", StopAnim)
+
+--==================================================
+-- SETTINGS PAGE (ตั้งค่า)
+--==================================================
+
+local SettingsPanel = Panel(Settings, "⚙  ตั้งค่า", UDim2.new(0, 0, 0, 0), UDim2.new(1, 0, 0, 130))
+
+Label(SettingsPanel, "พื้นที่สำหรับปรับแต่ง GUI", UDim2.new(1, -25, 0, 40), UDim2.new(0, 13, 0, 48), 12, GRAY)
+
+Label(SettingsPanel, "● พร้อมใช้งาน", UDim2.new(0, 130, 0, 20), UDim2.new(0, 13, 0, 90), 10, RED, Enum.Font.GothamBold)
+
+--==================================================
+-- MENU
+--==================================================
+
+local function SelectPage(name)
+	for pageName, page in pairs(Pages) do
+		page.Visible = pageName == name
+	end
+
+	for buttonName, button in pairs(MenuButtons) do
+		TweenService:Create(
+			button,
+			TweenInfo.new(0.12),
+			{ BackgroundColor3 = buttonName == name and RED or PANEL2 }
+		):Play()
+	end
+end
+
+for _, data in ipairs(MenuData) do
+	local order = data[1]
+	local icon = data[2]
+	local name = data[3]
+
+	local Button = Instance.new("TextButton")
+	Button.Name = name
+	Button.LayoutOrder = order
+	Button.Size = UDim2.new(1, 0, 0, 45)
+	Button.BackgroundColor3 = PANEL2
+	Button.Text = ""
+	Button.AutoButtonColor = false
+	Button.Parent = Sidebar
+
+	Corner(Button, 9)
+
+	local Icon = Label(
+		Button, icon,
+		UDim2.new(0, 38, 1, 0),
+		UDim2.new(0, 5, 0, 0),
+		18, WHITE, Enum.Font.GothamBold
+	)
+	Icon.TextXAlignment = Enum.TextXAlignment.Center
+
+	Label(
+		Button, name,
+		UDim2.new(1, -48, 1, 0),
+		UDim2.new(0, 48, 0, 0),
+		12, WHITE, Enum.Font.GothamMedium
+	)
+
+	MenuButtons[name] = Button
+
+	Button.MouseButton1Click:Connect(function()
+		SelectPage(name)
+	end)
+end
+
+SelectPage("หน้าหลัก")
+
+--==================================================
+-- PLAYER PROFILE - LEFT BOTTOM
+--==================================================
+
+local BottomProfile = Instance.new("Frame")
+BottomProfile.Name = "BottomProfile"
+BottomProfile.Size = UDim2.new(0, 155, 0, 55)
+BottomProfile.Position = UDim2.new(0, 15, 1, -65)
+BottomProfile.BackgroundTransparency = 1
+BottomProfile.Parent = Main
+
+local BottomAvatar = Instance.new("ImageLabel")
+BottomAvatar.Name = "Avatar"
+BottomAvatar.Size = UDim2.new(0, 45, 0, 45)
+BottomAvatar.Position = UDim2.new(0, 0, 0, 5)
+BottomAvatar.BackgroundColor3 = PANEL2
+BottomAvatar.Parent = BottomProfile
+
+Corner(BottomAvatar, 50)
+Stroke(BottomAvatar, RED, 2)
+
+pcall(function()
+	BottomAvatar.Image = Players:GetUserThumbnailAsync(
+		Player.UserId,
+		Enum.ThumbnailType.HeadShot,
+		Enum.ThumbnailSize.Size100x100
+	)
+end)
+
+Label(BottomProfile, Player.Name, UDim2.new(0, 100, 0, 22), UDim2.new(0, 55, 0, 7), 12, WHITE, Enum.Font.GothamBold)
+
+Label(BottomProfile, "● ONLINE", UDim2.new(0, 100, 0, 18), UDim2.new(0, 55, 0, 29), 10, RED, Enum.Font.GothamBold)
+
+--==================================================
+-- LOGO
+--==================================================
+
+local LogoButton = Instance.new("ImageButton")
+LogoButton.Name = "NEXORA_Logo"
+LogoButton.Size = UDim2.new(0, 58, 0, 58)
+LogoButton.Position = UDim2.new(0, 12, 1, -125)
+LogoButton.BackgroundColor3 = DARK
+LogoButton.Image = "rbxassetid://119290932517877"
+LogoButton.ScaleType = Enum.ScaleType.Fit
+LogoButton.AutoButtonColor = false
+LogoButton.Active = true
+LogoButton.ZIndex = 100
+LogoButton.Parent = Gui
+
+Corner(LogoButton, 50)
+Stroke(LogoButton, RED, 2)
+
+--==================================================
+-- OPEN / CLOSE
+--==================================================
+
+local Closing = false
+
+local function OpenGUI()
+	if Main.Visible then
+		return
+	end
+
+	Main.Visible = true
+	Main.AnchorPoint = Vector2.new(0.5, 0.5)
+	Main.Position = UDim2.new(0.5, 0, 0.5, 0)
+	Main.Size = UDim2.new(0, 600, 0, 430)
+
+	TweenService:Create(
+		Main,
+		TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+		{ Size = UDim2.new(0, 680, 0, 490) }
+	):Play()
+end
+
+local function CloseGUI()
+	if not Main.Visible or Closing then
+		return
+	end
+
+	Closing = true
+
+	local tween = TweenService:Create(
+		Main,
+		TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+		{ Size = UDim2.new(0, 600, 0, 430) }
+	)
+
+	tween:Play()
+	tween.Completed:Wait()
+
+	Main.Visible = false
+	Main.Size = UDim2.new(0, 680, 0, 490)
+
+	Closing = false
+end
+
+--==================================================
+-- LOGO DRAG + CLICK
+--==================================================
+
+local LogoDragging = false
+local LogoMoved = false
+local LogoDragStart = nil
+local LogoStartPos = nil
+
+local DRAG_THRESHOLD = 8
+
+LogoButton.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+
+		LogoDragging = true
+		LogoMoved = false
+
+		LogoDragStart = input.Position
+		LogoStartPos = LogoButton.Position
+
+		TweenService:Create(
+			LogoButton,
+			TweenInfo.new(0.1, Enum.EasingStyle.Quad),
+			{ Size = UDim2.new(0, 64, 0, 64) }
+		):Play()
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if not LogoDragging then
+		return
+	end
+
+	if input.UserInputType ~= Enum.UserInputType.MouseMovement
+		and input.UserInputType ~= Enum.UserInputType.Touch then
+		return
+	end
+
+	local delta = input.Position - LogoDragStart
+
+	if math.abs(delta.X) >= DRAG_THRESHOLD
+		or math.abs(delta.Y) >= DRAG_THRESHOLD then
+		LogoMoved = true
+	end
+
+	LogoButton.Position = UDim2.new(
+		LogoStartPos.X.Scale,
+		LogoStartPos.X.Offset + delta.X,
+		LogoStartPos.Y.Scale,
+		LogoStartPos.Y.Offset + delta.Y
+	)
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+	if input.UserInputType ~= Enum.UserInputType.MouseButton1
+		and input.UserInputType ~= Enum.UserInputType.Touch then
+		return
+	end
+
+	if not LogoDragging then
+		return
+	end
+
+	LogoDragging = false
+
+	TweenService:Create(
+		LogoButton,
+		TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		{ Size = UDim2.new(0, 58, 0, 58) }
+	):Play()
+
+	if not LogoMoved then
+		if Main.Visible then
+			task.spawn(CloseGUI)
+		else
+			OpenGUI()
+		end
+	end
+end)
+
+--==================================================
+-- MIN / CLOSE BUTTONS
+--==================================================
+
+Min.MouseButton1Click:Connect(function()
+	task.spawn(CloseGUI)
+end)
+
+Close.MouseButton1Click:Connect(function()
+	Gui:Destroy()
+end)
