@@ -1643,8 +1643,7 @@ local function ApplyAvatarMorph(lastMorphNameOrId)
     end
 end
 
--- ดึง Service แบบที่ถูกต้อง (และใช้ cloneref ตามสไตล์โค้ดหลักของคุณ)
-local RunService = cloneref and cloneref(game:GetService("RunService")) or game:GetService("RunService")
+RunService = game:GetService("RunService")
 
 task.spawn(function()
     localPlayer3.CharacterAdded:Connect(function(character)
